@@ -5,17 +5,24 @@ import { db } from "@/lib/db"
 export const createUser = async (user) => {
   const { id, first_name, last_name, email_address, image_url, username } =
     user;
+  console.log("createUser function called with data:", user);
+  
   try {
+    console.log("Checking if user exists...");
     const userExists = await db.user.findUnique({
       where: {
         id,
       },
     });
+    console.log("User exists check result:", userExists);
+
     if (userExists) {
-      updateUser(user);
-      return;
+      console.log("User already exists, updating instead...");
+      return await updateUser(user);
     }
-    await db.user.create({
+
+    console.log("Creating new user...");
+    const newUser = await db.user.create({
       data: {
         id,
         first_name,
@@ -25,22 +32,22 @@ export const createUser = async (user) => {
         username,
       },
     });
-    console.log("New user created in db");
+    console.log("New user created successfully:", newUser);
+    return { success: true, data: newUser };
   } catch (e) {
-    console.log(e);
+    console.error("Error in createUser:", e);
     return {
       error: "Failed to save new user in db",
+      details: e.message
     };
   }
-
-  console.log("User created in supabase");
 };
 
 export const updateUser = async (user) => {
   const { id, first_name, last_name, email_address, image_url, username } =
     user;
   try {
-    await db.user.update({
+    const updatedUser = await db.user.update({
       where: {
         id,
       },
@@ -52,16 +59,16 @@ export const updateUser = async (user) => {
         username,
       },
     });
+    console.log("User updated successfully:", updatedUser);
+    return { success: true, data: updatedUser };
   } catch (e) {
-    console.log(e);
+    console.error("Error in updateUser:", e);
     return {
       error: "Failed to update user in db",
+      details: e.message
     };
   }
-
-  console.log("User updated in supabase");
 };
-
 
 export const getUser = async (id) => {
   try {
@@ -80,25 +87,30 @@ export const getUser = async (id) => {
         banner_id: true,
       },
     });
-    return { data: user };
+    return { success: true, data: user };
   } catch (e) {
-    throw e;
+    console.error("Error in getUser:", e);
+    return {
+      error: "Failed to get user from db",
+      details: e.message
+    };
   }
 };
 
 export const deleteUser = async (id) => {
   try {
-    await db.user.delete({
+    const deletedUser = await db.user.delete({
       where: {
         id,
       },
     });
+    console.log("User deleted successfully:", deletedUser);
+    return { success: true, data: deletedUser };
   } catch (e) {
-    console.log(e);
+    console.error("Error in deleteUser:", e);
     return {
-      error: "Failed to delete user in db",
+      error: "Failed to delete user from db",
+      details: e.message
     };
   }
-
-  console.log("User deleted in supabase");
 };

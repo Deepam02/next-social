@@ -23,6 +23,8 @@ export async function POST(req) {
   const payload = await req.json();
   const body = JSON.stringify(payload);
 
+  console.log("Webhook payload received:", payload);
+
   const wh = new Webhook(WEBHOOK_SECRET);
 
   let evt;
@@ -41,16 +43,25 @@ export async function POST(req) {
   }
 
   const eventType = evt.type;
+  console.log("Event type:", eventType);
 
   const { id, first_name, last_name, email_addresses, image_url, username } =
     evt.data;
 
   const email_address = email_addresses?.[0].email_address;
+  console.log("User data to be processed:", {
+    id,
+    first_name,
+    last_name,
+    email_address,
+    image_url,
+    username,
+  });
 
-  console.log("event received");
   if (eventType === "user.created") {
     try {
-      await createUser({
+      console.log("Attempting to create user...");
+      const result = await createUser({
         id,
         first_name,
         last_name,
@@ -58,14 +69,26 @@ export async function POST(req) {
         image_url,
         username,
       });
-    } catch {
-      throw new Error("Failed to save new user in db");
+      
+      if (result?.error) {
+        console.error("Error creating user:", result.error);
+        return new Response(JSON.stringify({ error: result.error }), {
+          status: 500,
+        });
+      }
+      
+      console.log("Create user result:", result);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      return new Response(JSON.stringify({ error: "Failed to save new user in db" }), {
+        status: 500,
+      });
     }
   }
 
   if (eventType === "user.updated") {
     try {
-      await updateUser({
+      const result = await updateUser({
         id,
         first_name,
         last_name,
@@ -73,16 +96,36 @@ export async function POST(req) {
         image_url,
         username,
       });
-    } catch {
-      throw new Error("Failed to update user in db");
+      
+      if (result?.error) {
+        console.error("Error updating user:", result.error);
+        return new Response(JSON.stringify({ error: result.error }), {
+          status: 500,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
+      return new Response(JSON.stringify({ error: "Failed to update user in db" }), {
+        status: 500,
+      });
     }
   }
 
   if (eventType === "user.deleted") {
     try {
-      await deleteUser({ id });
-    } catch {
-      throw new Error("Failed to delete user in db");
+      const result = await deleteUser({ id });
+      
+      if (result?.error) {
+        console.error("Error deleting user:", result.error);
+        return new Response(JSON.stringify({ error: result.error }), {
+          status: 500,
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return new Response(JSON.stringify({ error: "Failed to delete user in db" }), {
+        status: 500,
+      });
     }
   }
 
