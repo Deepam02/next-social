@@ -13,12 +13,14 @@ const HomeLayout = ({ children }) => {
         <Box 
          type="baseBg"
          style={{
-          position:"relative",
-          width:"100vh",
-          height:"100vh",
+          position: "fixed",
+          width: "100vw",
+          height: "100vh",
+          top: 0,
+          left: 0,
+          overflow: "hidden"
          }}
         >
-
           <div className={css.wrapper}>
             {/* header  */}
             <Header/>

@@ -16,6 +16,8 @@ const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { signOut } = useClerk();
+  const [mounted,setMounted] = useState(false);
+  useEffect(()=>{setMounted(true)},[])
 
   const {
     settings: { isSidebarOpen },
@@ -43,8 +45,7 @@ const Sidebar = () => {
   const activeColor = (route) => {
     return isActive(route) && "var(--primary)";
   };
-  return (
-    <SidebarContainer
+  return mounted && <SidebarContainer
       isDrawerOpen={isSidebarOpen}
       setIsDrawerOpen={handleDrawerClose}
     >
@@ -86,7 +87,6 @@ const Sidebar = () => {
         </Box>
       </div>
     </SidebarContainer>
-  );
 };
 
 export default Sidebar;

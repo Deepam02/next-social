@@ -1,3 +1,4 @@
+import HomeView from "@/sections/home/view/HomeView";
 
 
 export const metadata = () => {
@@ -8,7 +9,7 @@ export const metadata = () => {
 };
 
 const HomePage = async () => {
-return <>main page</>
+return <HomeView/>
 
 };
 
