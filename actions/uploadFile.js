@@ -6,7 +6,7 @@ export const uploadFile = async (file, folder) => {
     // Upload image to Cloudinary
     const res = cld.v2.uploader.upload(
       file,
-      { folder: `socialhop/${folder}`, resource_type: "auto" },
+      { folder: `next-social/${folder}`, resource_type: "auto" },
       (error, result) => {
         if (error) {
           console.error("Error uploading image:", error);
